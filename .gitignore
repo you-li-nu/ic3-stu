@@ -1,3 +1,5 @@
 /abc
 /libabc.a
 /demo
+*.o
+*.d
