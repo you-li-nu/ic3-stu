@@ -81,7 +81,7 @@ void Pdr_ManSetDefaultParams( Pdr_Par_t * pPars )
     pPars->nDropOuts      =       0;  // the number of timed out outputs
     pPars->timeLastSolved =       0;  // last one solved
     pPars->pInvFileName   =    NULL;  // invariant file name
-    pPars->fusetoFrame   =    -1;  // the greatest idex of fused frame //youl
+    pPars->fusetoFrame   =    -1;  // the greatest index of fused frame //youl
 }
 
 /**Function*************************************************************
@@ -769,10 +769,9 @@ int Pdr_ManGeneralize( Pdr_Man_t * p, int k, Pdr_Set_t * pCube, Pdr_Set_t ** ppP
 
             // try removing this literal
             Lit = pCubeMin->Lits[i]; pCubeMin->Lits[i] = -1;
-            int Lit2;
-            int k;
+            
             //youl starts
-            int numLo = Saig_ManRegNum(p);
+            int numLo = Saig_ManRegNum(p->pAig);
             assert(numLo % 2 == 0);
             int numLodiv2 = numLo / 2;
 
@@ -780,6 +779,7 @@ int Pdr_ManGeneralize( Pdr_Man_t * p, int k, Pdr_Set_t * pCube, Pdr_Set_t ** ppP
             int LitVar = Abc_Lit2Var( Lit );
             assert(LitVar >= Lo0Var);
             assert(LitVar < Lo0Var + numLo);
+            int Lit2;
 
             int matched = 0;
             if (LitVar < Lo0Var + numLodiv2) {

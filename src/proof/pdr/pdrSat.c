@@ -306,12 +306,13 @@ int Pdr_ManCheckCube( Pdr_Man_t * p, int k, Pdr_Set_t * pCube, Pdr_Set_t ** ppPr
         assert(p->pPars->fusetoFrame >= k - 1);
         if (p->pPars->fusetoFrame >= k - 1) {
             Aig_Obj_t * pObj_fuse;
-            Vec_Int_t * vLits_fuse;
-            int numLo = Saig_ManRegNum(p);
+            Vec_Int_t * vLits_fuse = NULL;
+            int numLo = Saig_ManRegNum( p->pAig );
             assert(numLo % 2 == 0);
             int numLodiv2 = numLo / 2;
             int RetValue_fuse, Lit_fuse0, Lit_fuse1;
-            Saig_ManForEachLo( pAig, pObj_fuse, i )
+            int i;
+            Saig_ManForEachLo( p->pAig, pObj_fuse, i )
             {
                 if (i == numLodiv2) break;
 
