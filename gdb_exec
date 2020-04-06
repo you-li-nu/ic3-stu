@@ -1,0 +1,3 @@
+gdb ./demo
+set args ./duplicate_netlist/merge_flip.bench
+r

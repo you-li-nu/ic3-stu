@@ -98,7 +98,7 @@ int main( int argc, char * argv[] )
 clk = clock();
     //////////////////////////////////////////////////////////////////////////
     // read the file
-    sprintf( Command, "read %s", pFileName );
+    sprintf( Command, "read_bench %s", pFileName );
     if ( Cmd_CommandExecute( pAbc, Command ) )
     {
         fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
