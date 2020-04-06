@@ -1,0 +1,5 @@
+# register 0
+fast_R0_OUT_0 = DFF(fast_R0_IN_0)
+# flip 0
+fast_R0_IN_0 = XOR(fast_R0_OUT_0, vdd)
+OUTPUT(fast_R0_OUT_0)

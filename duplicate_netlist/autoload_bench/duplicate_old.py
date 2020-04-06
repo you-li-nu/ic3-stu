@@ -12,14 +12,8 @@ def main():
         assert(False)
     file0 = sys.argv[1]#slow
     file1 = sys.argv[2]#fast
-    #file2 = file0.split('.')[0] + '_' + file1.split('.')[0] + "_syn" + ".bench"
-    #file3 = file0.split('.')[0] + '_' + file1.split('.')[0] + "_stu" + ".bench"
-
-    filename0 = file0[file0.index('_') + 1 : file0.rindex('.')]
-    filename1 = file1[file1.index('_') + 1 : file1.rindex('.')]
-    assert(filename0 == filename1)
-    file2 = "syn_" + filename0 + ".bench"
-    file3 = "stu_" + filename0 + ".bench"
+    file2 = file0.split('.')[0] + '_' + file1.split('.')[0] + "_syn" + ".bench"
+    file3 = file0.split('.')[0] + '_' + file1.split('.')[0] + "_stu" + ".bench"
     print ("file0: " + file0)
     print ("file1: " + file1)
     print ("file2: " + file2)
@@ -28,43 +22,33 @@ def main():
     f1 = open(file1, 'r')
     f2 = open(file2, 'w')
     f3 = open(file3, 'w')
-    input_list = []# assume inputs are identical to both circuits.
-    output0_list = []
-    output1_list = []
+    input_list = []
     
     for line in f0.read().splitlines():
-        if line.startswith('#'):
+        if line.startswith('#') or line.startswith('OUTPUT('):#ignore outputs
             continue
         if line.startswith('INPUT('):
             input_list.append(line[line.index('(') + 1:line.index(')')])
-        if line.startswith('OUTPUT('):
-            output0_list.append(line[line.index('(') + 1:line.index(')')])
-            continue
         #print (line)
-        f2.write(process_line(line, '', input_list))
-        f3.write(process_line(line, '', input_list))
-    dff_out_list = []# f1
-    dff_in_list = []# f1                        
+        f2.write(process_line(line, "slow_", input_list))
+        f3.write(process_line(line, "slow_", input_list))
+    dff_out_list = []
+    dff_in_list = []
     #print(input_list)
     for line in f1.read().splitlines():
-        if line.startswith('#') or line.startswith('INPUT('):#ignore inputs and outputs
+        if line.startswith('#') or line.startswith('OUTPUT(') or line.startswith('INPUT('):#ignore inputs and outputs
             continue
-        if line.startswith('OUTPUT('):
-            output1_list.append(line[line.index('(') + 1:line.index(')')])
-            continue
-        f2.write(process_line(line, '', input_list))
+        f2.write(process_line(line, "fast_", input_list))
         if "DFF" in line and "vdd" not in line and "gnd" not in line:
-            process_dff(line, '', dff_out_list, dff_in_list)
-            f3.write(process_line(line, '', input_list))
+            process_dff(line, "fast_", dff_out_list, dff_in_list)
+            f3.write(process_line(line, "fast_", input_list))
         else:
             continue
     for i in range(len(dff_out_list)):
-        newline = dff_in_list[i] + " = BUF(" + dff_out_list[i] + ')' + '\n'
+        newline = "fast_" + dff_in_list[i] + " = BUF(" + "fast_" + dff_out_list[i] + ')' + '\n'
         f3.write(newline)
-
-    output_list = output0_list + output1_list
-    add_metering('', '', f2, output_list)
-    add_metering('', '', f3, output_list)
+    add_metering("slow_", "fast_", f2, dff_out_list, dff_in_list)
+    add_metering("slow_", "fast_", f3, dff_out_list, dff_in_list)
     f0.close()
     f1.close()
     f2.close()
@@ -117,25 +101,37 @@ def add_label(seg, label, input_list):
     else:
         return label + seg
         
-def add_metering(label0, label1, f, output_list):
-    # assume 2 * k primary outputs in each copy of the product machine.
+def add_metering(label0, label1, f, dff_out_list, dff_in_list):
+    # assume 2 * k primary inputs in each copy of the product machine.
     # named 
-    assert(len(output_list) % 2 == 0)
-    length = len(output_list) // 2
-    # switch equiv
-    for i in range(length):
-        f.write("NEQUIV_" + str(i) + " = " + "XOR(" + label0 + output_list[i] + ", " + label1 + output_list[i + length] + ')' + '\n')
-    f.write("NEQUIV" + " = " + "OR(")
-    for i in range(length):
-        f.write("NEQUIV_" + str(i))
-        if i != (length - 1):
+    assert(len(dff_out_list) % 2 == 0)
+    length = len(dff_out_list) // 2
+    # equiv
+    for i in range(length + length):
+        f.write("EQUIV_0_" + str(i) + " = " + "NXOR(" + label0 + dff_out_list[i] + ", " + label1 + dff_out_list[i] + ')' + '\n')
+    f.write("EQUIV_0" + " = " + "AND(")
+    for i in range(length + length):
+        f.write("EQUIV_0_" + str(i))
+        if i != (length + length - 1):
             f.write(", ")
         else:
-            if length == 1:
-                f.write(", gnd")
+            f.write(')' + '\n')
+    # switch equiv
+    for i in range(length + length):
+        if i < length:
+            f.write("EQUIV_1_" + str(i) + " = " + "NXOR(" + label0 + dff_out_list[i] + ", " + label1 + dff_out_list[i + length] + ')' + '\n')
+        else:
+            f.write("EQUIV_1_" + str(i) + " = " + "NXOR(" + label0 + dff_out_list[i] + ", " + label1 + dff_out_list[i - length] + ')' + '\n')
+    f.write("EQUIV_1" + " = " + "AND(")
+    for i in range(length + length):
+        f.write("EQUIV_1_" + str(i))
+        if i != (length + length - 1):
+            f.write(", ")
+        else:
             f.write(')' + '\n')
     # equiv output
-    f.write("OUTPUT(" + "NEQUIV" + ')' + '\n')
+    f.write("EQUIV" + " = " + "OR(" + "EQUIV_0" + ", " + "EQUIV_1" + ')' + '\n')
+    f.write("OUTPUT(" + "EQUIV" + ')' + '\n')
     
         
     

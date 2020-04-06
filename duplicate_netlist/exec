@@ -1,0 +1,6 @@
+read_bench ./duplicate_netlist/fast_flip.bench
+strash
+write_aiger ./duplicate_netlist/fast_flip.aig
+read_aiger ./duplicate_netlist/fast_flip.aig
+zero
+xsim

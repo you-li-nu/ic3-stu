@@ -1,0 +1,11 @@
+# register 0
+R0_OUT_0 = DFF(R0_IN_0)
+R0_OUT_1 = DFF(R0_IN_1)
+R0_OUT_2 = DFF(R0_IN_2)
+R0_OUT_3 = DFF(R0_IN_3)
+# shifter 0
+R0_IN_0 = vdd
+R0_IN_1 = BUF(R0_OUT_0)
+R0_IN_2 = BUF(R0_OUT_1)
+R0_IN_3 = BUF(R0_OUT_2)
+OUTPUT(R0_OUT_3)

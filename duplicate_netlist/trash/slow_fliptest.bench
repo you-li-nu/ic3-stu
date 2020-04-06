@@ -1,0 +1,20 @@
+# register 0
+slow_R0_OUT_0 = DFF(slow_AUX_R0_IN_0)
+# flip 0
+slow_R0_IN_0 = XOR(slow_R0_OUT_0, vdd)
+OUTPUT(slow_R0_OUT_0)
+# flip register
+slow_RFLIP_OUT_0 = DFF(slow_RFLIP_IN_0)
+slow_RFLIP_OUT_1 = DFF(slow_RFLIP_IN_1)
+slow_RFLIP_OUT_2 = DFF(slow_RFLIP_IN_2)
+slow_RFLIP_OUT_3 = DFF(slow_RFLIP_IN_3)
+# init 0
+slow_INIT_0 = NOR(slow_RFLIP_OUT_0, slow_RFLIP_OUT_1, slow_RFLIP_OUT_2, slow_RFLIP_OUT_3)
+# wire flip register
+slow_RFLIP_IN_0 = OR(slow_RFLIP_OUT_3, slow_INIT_0)
+slow_RFLIP_IN_1 = BUF(slow_RFLIP_OUT_0)
+slow_RFLIP_IN_2 = BUF(slow_RFLIP_OUT_1)
+slow_RFLIP_IN_3 = BUF(slow_RFLIP_OUT_2)
+slow_DIFF_0 = XOR(slow_R0_OUT_0, slow_R0_IN_0)
+slow_FLIP_0 = AND(slow_DIFF_0, slow_RFLIP_OUT_3)
+slow_AUX_R0_OUT_0 = AND(slow_R0_OUT_0, slow_FLIP_0)
