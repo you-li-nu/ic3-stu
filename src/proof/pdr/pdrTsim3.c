@@ -217,7 +217,7 @@ Pdr_Set_t * Txs3_ManTernarySim( Txs3_Man_t * p, int k, Pdr_Set_t * pCube )
     }
 if ( 0 )
 {
-Abc_Print( 1, "Trying to justify cube " );
+Abc_Print( 1, "Trying to justify cube (pdrTsim3) " );
 if ( pCube )
     Pdr_SetPrint( stdout, pCube, Gia_ManRegNum(p->pGia), NULL );
 else

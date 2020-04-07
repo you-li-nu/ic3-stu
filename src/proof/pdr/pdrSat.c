@@ -303,10 +303,14 @@ int Pdr_ManCheckCube( Pdr_Man_t * p, int k, Pdr_Set_t * pCube, Pdr_Set_t ** ppPr
         //pairwisely fuse the latch outputs of two branches of the product machine.
         //Lo is the output of the latch. It is indeed the inputs of the circuit.
         //Assume the solver of the current frame is not fused. Assume 
-        assert(p->pPars->fusetoFrame >= k - 1);
-        if (p->pPars->fusetoFrame >= k - 1) {
+        if (!(p->pPars->fusetoFrame >= k - 1)){
+            Abc_Print( 1, " k : %d.\n", k );
+            Abc_Print( 1, " fusetoFrame : %d.\n", p->pPars->fusetoFrame );
+            assert(0);
+        }
+        if (p->pPars->fusetoFrame == k - 1) {
             Aig_Obj_t * pObj_fuse;
-            Vec_Int_t * vLits_fuse = NULL;
+            Vec_Int_t * vLits_fuse = Vec_IntAlloc( 100 );  // array of literals
             int numLo = Saig_ManRegNum( p->pAig );
             assert(numLo % 2 == 0);
             int numLodiv2 = numLo / 2;
@@ -335,6 +339,7 @@ int Pdr_ManCheckCube( Pdr_Man_t * p, int k, Pdr_Set_t * pCube, Pdr_Set_t ** ppPr
                 RetValue_fuse = sat_solver_addclause( pSat, Vec_IntArray(vLits_fuse), Vec_IntArray(vLits_fuse)+Vec_IntSize(vLits_fuse) );
                 assert(RetValue_fuse);
             }
+            p->pPars->fusetoFrame = k;
         }
         
         //youl ends

@@ -385,12 +385,13 @@ Pdr_Set_t * Pdr_ManTernarySim( Pdr_Man_t * p, int k, Pdr_Set_t * pCube )
     }
 if ( p->pPars->fVeryVerbose )
 {
-Abc_Print( 1, "Trying to justify cube " );
+Abc_Print( 1, "Trying to justify cube (pdrTsim) " );
 if ( pCube )
     Pdr_SetPrint( stdout, pCube, Aig_ManRegNum(p->pAig), NULL );
 else
     Abc_Print( 1, "<prop=fail>" );
-Abc_Print( 1, " in frame %d.\n", k );
+Abc_Print( 1, " in frame %d.", k );
+Abc_Print( 1, "\n");
 }
 
     // collect CI objects

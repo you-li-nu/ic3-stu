@@ -416,7 +416,7 @@ int ZPdr_ManDown( Pdr_Man_t * p, int k, Pdr_Set_t ** ppCube, Pdr_Set_t * pPred, 
             // add new clause
             if ( p->pPars->fVeryVerbose )
             {
-                Abc_Print( 1, "Adding cube " );
+                Abc_Print( 1, "Adding cube in ZPdr_ManDown " );
                 Pdr_SetPrint( stdout, pCubeMin, Aig_ManRegNum(p->pAig), NULL );
                 Abc_Print( 1, " to frame %d.\n", l );
             }
@@ -449,7 +449,7 @@ int ZPdr_ManDown( Pdr_Man_t * p, int k, Pdr_Set_t ** ppCube, Pdr_Set_t * pPred, 
         //join
         if ( p->pPars->fVeryVerbose )
         {
-            printf("Cube:\n");
+            printf("Cube (join in down):\n");
             ZPdr_SetPrint( *ppCube );
             printf("\nPred:\n");
             ZPdr_SetPrint( pPred );
@@ -723,7 +723,7 @@ int Pdr_ManGeneralize( Pdr_Man_t * p, int k, Pdr_Set_t * pCube, Pdr_Set_t ** ppP
         *ppCubeMin = pCubeMin;
         if ( p->pPars->fVeryVerbose )
         {
-            printf("Cube:\n");
+            printf("Cube (fSimpleGeneral):\n");
             for ( i = 0; i < pCubeMin->nLits; i++)
                 printf ("%d ", pCubeMin->Lits[i]);
             printf("\n");
@@ -782,22 +782,31 @@ int Pdr_ManGeneralize( Pdr_Man_t * p, int k, Pdr_Set_t * pCube, Pdr_Set_t ** ppP
             int Lit2;
 
             int matched = 0;
+            int kk;
+            Abc_Print( 1, " 233\n" );
             if (LitVar < Lo0Var + numLodiv2) {
-                for ( k = 0; k < pCubeMin->nLits; k++ ) {
-                    if ( Abc_Lit2Var(pCubeMin->Lits[k]) == LitVar + numLodiv2 ) {
-                        Lit2 = pCubeMin->Lits[k]; pCubeMin->Lits[k] = -1;
+                for ( kk = 0; kk < pCubeMin->nLits; kk++ ) {
+                    Abc_Print( 1, " kk : %d.\n", kk );
+                    Abc_Print( 1, " pCubeMin : %d.\n", pCubeMin->Lits[kk] );
+                    if (!( pCubeMin->Lits[kk] >= 0 )) {continue;}
+                    if ( Abc_Lit2Var(pCubeMin->Lits[kk]) == LitVar + numLodiv2 ) {
+                        Lit2 = pCubeMin->Lits[kk]; pCubeMin->Lits[kk] = -1;
                         matched++;
                     }
                 }
             } else { //LitVar >= Lo0Var + numLodiv2
-                for ( k = 0; k < pCubeMin->nLits; k++ ) {
-                    if ( Abc_Lit2Var(pCubeMin->Lits[k]) == LitVar - numLodiv2 ) {
-                        Lit2 = pCubeMin->Lits[k]; pCubeMin->Lits[k] = -1;
+                for ( kk = 0; kk < pCubeMin->nLits; kk++ ) {
+                    Abc_Print( 1, " kk : %d.\n", kk );
+                    Abc_Print( 1, " pCubeMin : %d.\n", pCubeMin->Lits[kk] );
+                    if (!( pCubeMin->Lits[kk] >= 0 )) {continue;}
+                    if ( Abc_Lit2Var(pCubeMin->Lits[kk]) == LitVar - numLodiv2 ) {
+                        Lit2 = pCubeMin->Lits[kk]; pCubeMin->Lits[kk] = -1;
                         matched++;
                     }
                 }
             }
             assert(matched == 1);
+            Abc_Print( 1, " 234\n" );
             //youl ends
 
 
@@ -812,7 +821,8 @@ int Pdr_ManGeneralize( Pdr_Man_t * p, int k, Pdr_Set_t * pCube, Pdr_Set_t ** ppP
             }
             pCubeMin->Lits[i] = Lit;
             //youl starts
-            pCubeMin->Lits[k] = Lit2;
+            pCubeMin->Lits[kk] = Lit2;
+            Abc_Print( 1, " 235\n" );
             //youl ends
             if ( RetValue == 0 )//comment: CheckCube failed.
             {
@@ -907,10 +917,9 @@ int Pdr_ManGeneralize( Pdr_Man_t * p, int k, Pdr_Set_t * pCube, Pdr_Set_t ** ppP
     assert( ppCubeMin != NULL );
     if ( p->pPars->fVeryVerbose )
     {
-        printf("Cube:\n");
-        for ( i = 0; i < pCubeMin->nLits; i++)
-            printf ("%d ", pCubeMin->Lits[i]);
-        printf("\n");
+        Abc_Print( 1, "Cube (after generalization):" );
+        Pdr_SetPrint( stdout, pCubeMin, Aig_ManRegNum(p->pAig), NULL );
+        Abc_Print( 1, "\n" );
     }
     *ppCubeMin = pCubeMin;
     p->tGeneral += Abc_Clock() - clk;
@@ -1011,7 +1020,7 @@ int Pdr_ManBlockCube( Pdr_Man_t * p, Pdr_Set_t * pCube )
             // add new clause
             if ( p->pPars->fVeryVerbose )
             {
-                Abc_Print( 1, "Adding cube " );
+                Abc_Print( 1, "Adding cube in Pdr_ManBlockCube " );
                 Pdr_SetPrint( stdout, pCubeMin, Aig_ManRegNum(p->pAig), NULL );
                 Abc_Print( 1, " to frame %d.\n", k );
             }
